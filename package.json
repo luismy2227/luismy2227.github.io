@@ -1,5 +1,5 @@
 {
-  "name": "ga-coffee",
+  "name": "ga-coffee-2",
   "version": "0.1.2",
   "private": true,
   "dependencies": {
@@ -43,5 +43,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "homepage": "https://luismy2227.github.io/ga-coffee-2"
 }
