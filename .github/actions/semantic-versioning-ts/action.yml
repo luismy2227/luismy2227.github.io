@@ -1,0 +1,20 @@
+name: Semantic versioning
+author: Luis Andino
+description: |
+  This will scan your commits and create a semantic new version for your project
+inputs:
+  token:
+    description: "A valid token for the repo"
+    required: true
+  actualVersion:
+    description: "The version of your project before the semantic release scan"
+    required: true
+  newVersionDecorator:
+    description: "The new version decorator, example: stable, letting your new version like 1.0.0-stable"
+    required: false
+outputs:
+  newVersion:
+    description: "The new version of your project after the semantic release scan"
+runs:
+  using: "node12"
+  main: "dist/index.js"

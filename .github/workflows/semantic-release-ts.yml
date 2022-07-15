@@ -1,0 +1,56 @@
+name: Release creator
+on:
+  pull_request:
+    branches:
+      - develop
+    types:
+      - closed
+jobs:
+  semantic-release:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get actual version
+        id: actual_version_getter
+        uses: ./.github/actions/get-version-from-package-json
+      - name: Log received version
+        run: |
+          echo "The received version is:"
+          echo ${{ steps.actual_version_getter.outputs.actualVersion }}
+      - name: Getting new version
+        uses: ./.github/actions/semantic-versioning-ts
+        id: semantic_versioning
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          actualVersion: ${{steps.actual_version_getter.outputs.actualVersion}}
+      - name: Log new version
+        run: |
+          echo "new version is:" ${{ steps.semantic_versioning.outputs.newVersion }}
+      - name: Use Node.js 16
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: Setup Git
+        run: |
+          git config user.name ci-bot
+          git config user.email ci-bot@codexitos.com
+          {
+            git remote add gh-origin https://ci-bot:${ADMIN_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          }||{
+            echo "Remote already exists"
+          }
+        env:
+          ADMIN_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Bump version patch
+        run: |
+          npm version ${{ steps.semantic_versioning.outputs.newVersion }} --force
+        env:
+          CI: true
+      - name: Push commit and tag to GitHub
+        run: |
+          git push -f gh-origin HEAD:develop
+      - name: Creating the release
+        uses: ./.github/actions/create-github-release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: ${{steps.semantic_versioning.outputs.newVersion}}

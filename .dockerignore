@@ -1,0 +1,8 @@
+node_modules
+Dockerfile
+.releaserc
+docker-push-ecr-unix-ga.sh
+publish.sh
+README.md
+.github
+.gitignore

@@ -1,0 +1,21 @@
+name: Create release
+author: Luis Andino
+description: |
+  This will create a new github release
+inputs:
+  token:
+    description: "A valid token for the repo"
+    required: true
+  version:
+    description: "The version of your project before the semantic release scan"
+    required: true
+  target:
+    description: "The target branch of the release"
+    required: true
+    default: "develop"
+outputs:
+  release:
+    description: "The new release of your repo"
+runs:
+  using: "node12"
+  main: "dist/index.js"

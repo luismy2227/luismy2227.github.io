@@ -1,0 +1,42 @@
+name: Push docker image to ecr private repository
+on:
+  push:
+    branches:
+      - master
+jobs:    
+  push-to-ecr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      
+      - name: Login to Amazon ECR Private
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - uses: actions/checkout@v2
+      
+      - name: Build, tag and push
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: "dummy-img-name-private"
+        run: |
+          echo "getting the version from package.json"
+          VERSION=$(cat ./package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]')
+          echo version: $VERSION
+          echo "Building the image"
+          docker build -t $REGISTRY/$REPOSITORY:$VERSION .
+          echo "Pushing the image"
+          docker push $REGISTRY/$REPOSITORY:$VERSION
+      
+      - name: Warning on fail
+        if: failure()
+        uses: ./.github/actions/send-slack-message-composite
+        id: slack_composite
+        with:
+          text: "Something went wrong, please retire of programming"
+          webhook: ${{ secrets.PERSONAL_SLACK_WEBHOOK }}

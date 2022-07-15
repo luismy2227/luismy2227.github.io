@@ -1,0 +1,25 @@
+name: Send Slack Message
+author: Luis Andino
+description: |
+  This will send a slack message
+inputs:
+  webhook:
+    description: The url
+    required: true
+  message:
+    description: The message in a valid slack api structure
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Log message
+      shell: bash
+      run: |
+        echo ${{ inputs.message }}
+    - name: Send message
+      shell: bash
+      run: |
+        curl ${{ inputs.webhook }} \
+        -X POST \
+        --header "Content-type: application/json" \
+        --data '${{ inputs.message }}'

@@ -1,0 +1,23 @@
+name: Create Github Action
+author: Luis Andino
+description: |
+  This will create a new github issue.
+inputs:
+  token:
+    description: "A valid token for the repo"
+    required: true
+  title:
+    description: "The title of the issue"
+    required: true
+  body:
+    description: "The body of the issue"
+    required: true
+  assignees:
+    description: "An string that will be parsed as the array of assignees"
+
+outputs:
+  issue:
+    description: "The created issue"
+runs:
+  using: "node12"
+  main: "dist/index.js"

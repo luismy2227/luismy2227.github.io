@@ -1,0 +1,63 @@
+name: Slack messages
+on: 
+  push:
+    branches:
+      - develop-fake
+jobs:
+  checkout:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+
+  test-slack-js:
+    runs-on: self-hosted
+    needs: checkout
+    steps:
+      - uses: ./.github/actions/send-slack-message-js
+        id: slack_js
+        with:
+          text: "This is the message from js"
+          webhook: ${{ secrets.PERSONAL_SLACK_WEBHOOK }}
+      - name: Log status
+        run: |
+          echo ${{ steps.slack_js.conclusion }}
+
+  test-slack-ts:
+    runs-on: self-hosted
+    needs: checkout
+    steps:
+      - uses: ./.github/actions/send-slack-message-ts
+        id: slack_ts
+        with:
+          text: "This is the message from ts"
+          webhook: ${{ secrets.PERSONAL_SLACK_WEBHOOK }}
+      - name: Log status
+        run: |
+          echo ${{ steps.slack_ts.conclusion }}
+
+  test-slack-composite:
+    runs-on: self-hosted
+    needs: checkout
+    steps:
+      - uses: ./.github/actions/send-slack-message-composite
+        id: slack_composite
+        with:
+          text: "This is the message from composite"
+          webhook: ${{ secrets.PERSONAL_SLACK_WEBHOOK }}
+      - name: Log status
+        run: |
+          echo ${{ steps.slack_composite.conclusion }}
+          
+  test-slack-composite-complex:
+    runs-on: self-hosted
+    needs: checkout
+    steps:
+      - uses: ./.github/actions/send-slack-message-composite-complex
+        id: slack_composite
+        with:
+          message: |
+            {"text": "*This is a complex message*", "type": "mrkdwn"}
+          webhook: ${{ secrets.PERSONAL_SLACK_WEBHOOK }}
+      - name: Log status
+        run: |
+          echo ${{ steps.slack_composite.conclusion }}

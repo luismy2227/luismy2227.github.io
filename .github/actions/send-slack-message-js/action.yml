@@ -1,0 +1,14 @@
+name: Send Slack Message
+author: Luis Andino
+description: |
+  This will receive a message and a slack webhook and send the message.
+inputs:
+  text:
+    description: "The message that you want to send"
+    required: true
+  webhook:
+    description: "The webhook where you want to send the message"
+    required: true
+runs:
+  using: "node12"
+  main: "dist/index.js"

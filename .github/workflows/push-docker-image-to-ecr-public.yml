@@ -1,0 +1,45 @@
+name: Push docker image to ecr public repository
+on:
+  push:
+    branches:
+      - master2
+jobs:    
+  push-to-ecr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      
+      - name: Login to Amazon ECR Private
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry-type: public
+      
+      - name: Build, tag and push
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REGISTRY_ALIAS: m7k1m8r7
+          REPOSITORY: dummy-img-name
+        run: |
+          echo "getting the version from package.json"
+          VERSION=$(cat ./package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]')
+          echo version: $VERSION
+          echo "Building the image"
+          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$VERSION .
+          echo "Pushing the image"
+          docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$VERSION
+      
+      - name: Warning on fail
+        if: failure()
+        uses: ./.github/actions/send-slack-message-composite
+        id: slack_composite
+        with:
+          text: "Something went wrong, please retire of programming"
+          webhook: ${{ secrets.PERSONAL_SLACK_WEBHOOK }}

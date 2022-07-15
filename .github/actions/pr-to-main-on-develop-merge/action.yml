@@ -1,0 +1,29 @@
+name: Create Github Action
+author: Luis Andino
+description: |
+  This will create a new github pull request.
+inputs:
+  token:
+    description: "A valid token for the repo"
+    required: true
+  title:
+    description: "The title of the pull request"
+    required: true
+  body:
+    description: "The body of the pull request"
+    required: true
+  assignees:
+    description: "An string that will be parsed as the array of assignees"
+  head:
+    description: "The branch where the changes come"
+    default: develop
+  base:
+    description: "The branch where you want the change to push"
+    default: main
+
+outputs:
+  pull_request:
+    description: "The created pull request"
+runs:
+  using: "node12"
+  main: "dist/index.js"
